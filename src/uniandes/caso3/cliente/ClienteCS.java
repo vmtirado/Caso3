@@ -54,7 +54,7 @@ public class ClienteCS {
 		public static final String SHA512= "HMACSHA512";
 		
 		//variable donde se guardan los algoritmos que el usuario decide usar 
-		private static String simetrico=AES;
+		private static String simetrico=BLOWFISH;
 		private static String asimetrico=RSA;
 		private static String Hmac=SHA1;
 

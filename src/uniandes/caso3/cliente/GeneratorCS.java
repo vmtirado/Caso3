@@ -10,7 +10,7 @@ public class GeneratorCS {
 		 */
 		private LoadGenerator generator;
 		
-		private static int numberOfTasks = 1;
+		private static int numberOfTasks = 10;
 		private long gapsBetweenTasks = 500;
 
 		/**
