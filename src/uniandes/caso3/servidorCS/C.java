@@ -46,6 +46,7 @@ public class C {
 		System.out.println("1");
 		System.out.println("2");
 		int nThreads=Integer.parseInt(stdIn.readLine());
+		System.out.println("El numero de Threads es "+ nThreads);
 		
 		ExecutorService ex = Executors.newFixedThreadPool(nThreads);
 		

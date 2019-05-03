@@ -33,17 +33,13 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 public class ClienteCS {
 	
 	public static  int numTransacciones; 
-	public static ArrayList<Long> tiempo;
-	public static ArrayList<Double> usoCPU;
+	public static ArrayList<Long> tiempo = new ArrayList<Long>();
+	public static ArrayList<Double> usoCPU = new ArrayList<Double>();
 	
 	//Configuracion puertos 
 	public static final int PUERTO= 8080;
 	public static final String SERVIDOR="localhost";
 	
-	//variable donde se guardan los algoritmos que el usuario decide usar 
-		private static String simetrico="";
-		private static String asimetrico="";
-		private static String Hmac="";
 		//Algoritmos simetricos
 		public static final String AES="AES";
 		public static final String BLOWFISH="Blowfish";
@@ -56,6 +52,11 @@ public class ClienteCS {
 		public static final String SHA256= "HMACSHA256";
 		public static final String SHA384= "HMACSHA384";
 		public static final String SHA512= "HMACSHA512";
+		
+		//variable donde se guardan los algoritmos que el usuario decide usar 
+		private static String simetrico=AES;
+		private static String asimetrico=RSA;
+		private static String Hmac=SHA1;
 
 		private static KeyPair llaveAsimetrica;
 		private static SecretKey llaveSimetrica;
@@ -94,38 +95,6 @@ public class ClienteCS {
 
 				//Si el servidor responde correctamente s escojen los algoritmos 
 				if (fromServer!=null && fromServer.equalsIgnoreCase("OK")){
-					System.out.println("Escoja el algoritmo simetrico");
-					System.out.println("1.AES");
-					System.out.println("2. BLOWFISH");
-					int respuesta=Integer.parseInt(stdIn.readLine());
-					switch (respuesta){
-					case 1:
-						simetrico=AES;
-						break;
-					case 2: 
-						simetrico= BLOWFISH;
-						break;
-					}
-					asimetrico= RSA;
-
-					System.out.println("Escoja el algoritmo hmac");
-					System.out.println("1."+SHA1);
-					System.out.println("2."+SHA256);
-					System.out.println("3."+ SHA384);
-					System.out.println("4."+ SHA512);
-					respuesta=Integer.parseInt(stdIn.readLine());
-					switch (respuesta){
-					case 1:
-						Hmac=SHA1;
-						break;
-					case 2:
-						Hmac=SHA256;
-						break;
-					case 3:
-						Hmac=SHA384;
-					case 4: 
-						Hmac=SHA512;
-					}
 					fromUser= "ALGORITMOS:"+simetrico+":"+RSA+":"+Hmac;
 					pOut.println(fromUser);
 					System.out.println("Mensaje al servidor: "+ fromUser);
@@ -220,13 +189,7 @@ public class ClienteCS {
 				//****************************************************************
 
 				//Obtiene las coordenadas para mandarselas al servidor
-				String datos= "15;4,24";
-				System.out.println("Ingrese los grados");
-				String grados =stdIn.readLine();
-				System.out.println("Ingrese los minutos");
-				String minutos =stdIn.readLine();
-				String coordenadas=idCliente+";"+grados+","+minutos;
-				System.out.println(datos);
+				String coordenadas= "15;4,24";
 				System.out.println("coordenadas "+coordenadas);
 				
 				byte[]cifrado=K.cifrar(llaveSimetrica, simetrico, coordenadas);

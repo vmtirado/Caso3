@@ -5,14 +5,12 @@ import uniandes.gload.core.Task;
 import uniandes.gload.examples.clientserver.generator.Generator;
 
 public class GeneratorCS {
-	
-
 		/**
 		 * Load Generator service
 		 */
 		private LoadGenerator generator;
 		
-		private static int numberOfTasks = 400;
+		private static int numberOfTasks = 1;
 		private long gapsBetweenTasks = 500;
 
 		/**
@@ -58,8 +56,10 @@ public class GeneratorCS {
 		 */
 		public static void main(String[] args) {
 
+			System.out.println("Entro al constructor");
 			@SuppressWarnings("unused")
-			Generator gen = new Generator();
+			GeneratorCS gen = new GeneratorCS ();
+			System.out.println("Creo el generador");
 			
 			int transaccionesP = numberOfTasks - ClienteCS.numTransacciones;
 			double promedio = 0.0;
