@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.security.KeyPair;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class C {
 	private static ServerSocket ss;	
@@ -38,13 +40,21 @@ public class C {
 		keyPairServidor = S.grsa();
 		certSer = S.gc(keyPairServidor);
 		D.initCertificate(certSer, keyPairServidor);
+		
+		BufferedReader stdIn= new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Escoja el numero de Threads que desea usar");
+		System.out.println("1");
+		System.out.println("2");
+		int nThreads=Integer.parseInt(stdIn.readLine());
+		
+		ExecutorService ex = Executors.newFixedThreadPool(nThreads);
+		
 		while (true) {
 			try { 
 				Socket sc = ss.accept();
 				System.out.println(MAESTRO + "Cliente " + idThread + " aceptado.");
-				D d = new D(sc,idThread);
+				ex.execute(new D(sc,idThread));
 				idThread++;
-				d.start();
 			} catch (IOException e) {
 				System.out.println(MAESTRO + "Error creando el socket cliente.");
 				e.printStackTrace();
