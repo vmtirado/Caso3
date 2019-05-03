@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.security.Key;
@@ -12,10 +13,15 @@ import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.xml.bind.DatatypeConverter;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -26,7 +32,9 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public class ClienteCS {
 	
-	public static int numTransacciones; 
+	public static  int numTransacciones; 
+	public static ArrayList<Long> tiempo;
+	public static ArrayList<Double> usoCPU;
 	
 	//Configuracion puertos 
 	public static final int PUERTO= 8080;
@@ -57,6 +65,7 @@ public class ClienteCS {
 
 
 		public  ClienteCS () throws Exception{
+			long tiempoIni=System.currentTimeMillis();
 			
 			Socket socket= new Socket(SERVIDOR,PUERTO);
 			
@@ -134,6 +143,8 @@ public class ClienteCS {
 				//****************************************************************
 				//ETAPA 2
 				//****************************************************************
+				
+				
 				if (fromServer!=null && fromServer.equalsIgnoreCase("OK")){
 					//Genero la llave asimetrica que usare durante el intercambio 
 					llaveAsimetrica =K.asimetricKey(RSA);
@@ -170,6 +181,12 @@ public class ClienteCS {
 					byte[] cifrado= K.cifrar(llavePublicaServidor,asimetrico,textoSimetrica);
 					pOut.println(DatatypeConverter.printHexBinary(cifrado));
 					System.out.println("Se le envio la llave simetrica cifrada al servidor: ");
+					
+					//Se mide el uso de cpu aqui ya que se decifra y cifran llaves 
+					
+					usoCPU.add(getSystemCpuLoad());
+					
+					
 				}
 				else {
 					System.err.println("El servidor mando una cadena vacia en vez del CD ");
@@ -239,7 +256,13 @@ public class ClienteCS {
 				}
 			}
 			
-			numTransacciones++;
+			//Tiempo de la transaccion 
+			long tiempoFin= System.currentTimeMillis();
+			tiempo.add(tiempoFin-tiempoIni);
+			
+			//se suma 1 transaccion 
+			numTransacciones++;s
+			
 		}
 
 
@@ -293,5 +316,18 @@ public class ClienteCS {
 		{
 			return h1.compareTo(h2)==0;
 		}
+		
+		public double getSystemCpuLoad() throws Exception {
+			 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			 ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+			 AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
+			 if (list.isEmpty()) return Double.NaN;
+			 Attribute att = (Attribute)list.get(0);
+			 Double value = (Double)att.getValue();
+			 // usually takes a couple of seconds before we get real values
+			 if (value == -1.0) return Double.NaN;
+			 // returns a percentage value with 1 decimal point precision
+			 return ((int)(value * 1000) / 10.0);
+			 }
 
 }

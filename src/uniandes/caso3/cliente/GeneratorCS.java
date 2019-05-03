@@ -2,6 +2,7 @@ package uniandes.caso3.cliente;
 
 import uniandes.gload.core.LoadGenerator;
 import uniandes.gload.core.Task;
+import uniandes.gload.examples.clientserver.generator.Generator;
 
 public class GeneratorCS {
 	
@@ -11,7 +12,7 @@ public class GeneratorCS {
 		 */
 		private LoadGenerator generator;
 		
-		private int numberOfTasks = 400;
+		private static int numberOfTasks = 400;
 		private long gapsBetweenTasks = 500;
 
 		/**
@@ -31,19 +32,21 @@ public class GeneratorCS {
 			return new ClientServerTaskCS();
 		}
 		
-		private static long totalTiempoTransaccion(){
+		//LOS DOS QUE SIGUEN ERAN ESTATICOS
+		
+		private static  long totalTiempoTransaccion(){
 			long total = 0;
-			for (int i = 0; i < Cliente.nTransacciones; i++) {
-				total += Cliente.tiempoTransaccion;
+			for (int i = 0; i < ClienteCS.numTransacciones; i++) {
+				total += ClienteCS.tiempo.get(i);
 			}		
 					
 			return total;
 		}
 		
-		private static double totalUsoCPU(){
+		private static  double totalUsoCPU(){
 			double total = 0;
-			for (int i = 0; i < Cliente.nTransacciones; i++) {
-				total += (Cliente.porcentajeUsoCPU/Cliente.cantCPU);
+			for (int i = 0; i < ClienteCS.numTransacciones; i++) {
+				total += (ClienteCS.usoCPU.get(i)/100); //Arreglar!!!
 			}		
 					
 			return total;
@@ -58,26 +61,25 @@ public class GeneratorCS {
 			@SuppressWarnings("unused")
 			Generator gen = new Generator();
 			
-			int transaccionesP = gen.numberOfTasks - Cliente.nTransacciones;
+			int transaccionesP = numberOfTasks - ClienteCS.numTransacciones;
 			double promedio = 0.0;
 			
-			if(Cliente.nTransacciones != 0){
-				 promedio = totalTiempoTransaccion()/Cliente.nTransacciones;
+			if(ClienteCS.numTransacciones != 0){
+				 promedio = totalTiempoTransaccion()/ClienteCS.numTransacciones;
 			}
 			
 			long total = totalTiempoTransaccion();
 			
 			double cpu = totalUsoCPU();
 			
-			DecimalFormat formato1 = new DecimalFormat("#.###");
 			
 			System.out.println("Transacciones perdidas: " + transaccionesP);
-			System.out.println("Transacciones terminadas: " + Cliente.nTransacciones);
+			System.out.println("Transacciones terminadas: " + ClienteCS.numTransacciones);
 			System.out.println("Tiempo total transacciones: " + total + " ms");
-			System.out.println("Tiempo de transaccion promedio: " + formato1.format(promedio) + " ms");
-			System.out.println("Total porcentaje de uso de CPU: " + formato1.format(cpu) + " %");
+			System.out.println("Tiempo de transaccion promedio: " + promedio + " ms");
+			System.out.println("Total porcentaje de uso de CPU: " + cpu + " %");
 	 	}
 
 	}
 
-}
+
