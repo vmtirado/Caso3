@@ -65,7 +65,8 @@ public class ClienteCS {
 		public static int idCliente= (int) (Math.random()*10);
 
 
-		public  ClienteCS () throws Exception{
+		public  ClienteCS (Semaforo sem) throws Exception{
+			sem.v();
 			long tiempoIni=System.currentTimeMillis();
 			
 			Socket socket= new Socket(SERVIDOR,PUERTO);
@@ -81,6 +82,7 @@ public class ClienteCS {
 
 			while(continuar)
 			{
+				
 				
 				//****************************************************************
 				//ETAPA 1
@@ -210,17 +212,19 @@ public class ClienteCS {
 				byte[] decifrado=K.decifrar(llavePublicaServidor, asimetrico, DatatypeConverter.parseHexBinary(fromServer));
 				
 				if(sameHash(DatatypeConverter.printHexBinary(hmac),DatatypeConverter.printHexBinary(decifrado))){
-					System.out.println("LO LOGRAMOS!!");
-					continuar=false;
 					//Tiempo de la transaccion 
 					long tiempoFin= System.currentTimeMillis();
 					tiempo.add(tiempoFin-tiempoIni);
 					
 					//se suma 1 transaccion 
 					numTransacciones++;
+					
+					System.out.println("LO LOGRAMOS!! "+numTransacciones);
+
 				}
 				else{
 					System.out.println("almost there");
+					
 					continuar=false;
 				}
 			}

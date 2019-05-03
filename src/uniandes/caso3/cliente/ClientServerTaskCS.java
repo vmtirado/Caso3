@@ -4,6 +4,11 @@ import uniandes.gload.core.Task;
 
 public class ClientServerTaskCS  extends Task {
 
+	private Semaforo s;
+	public  ClientServerTaskCS(Semaforo sem) {
+		// TODO Auto-generated constructor stub
+		s=sem;
+	}
 	@Override
 	public void fail() {
 		// TODO Auto-generated method stub
@@ -20,7 +25,7 @@ public class ClientServerTaskCS  extends Task {
 	public void execute() {
 		// TODO Auto-generated method stub
 		try {
-			ClienteCS clienteCS = new ClienteCS();
+			ClienteCS clienteCS = new ClienteCS(s);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

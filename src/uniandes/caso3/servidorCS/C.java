@@ -49,7 +49,7 @@ public class C {
 		System.out.println("El numero de Threads es "+ nThreads);
 		
 		ExecutorService ex = Executors.newFixedThreadPool(nThreads);
-		
+//		ex.awaitTermination(timeout, unit)
 		while (true) {
 			try { 
 				Socket sc = ss.accept();

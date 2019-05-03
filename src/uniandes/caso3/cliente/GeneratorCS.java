@@ -4,20 +4,21 @@ import uniandes.gload.core.LoadGenerator;
 import uniandes.gload.core.Task;
 import uniandes.gload.examples.clientserver.generator.Generator;
 
-public class GeneratorCS {
+public class GeneratorCS extends Thread{
 		/**
 		 * Load Generator service
 		 */
 		private LoadGenerator generator;
 		
-		private static int numberOfTasks = 3;
+		private static  int numberOfTasks = 200;
 		private long gapsBetweenTasks = 20;
+
 
 		/**
 		 * Constructor de un nuevo generador
 		 */
-		public GeneratorCS(){
-			Task work = createTask();
+		public GeneratorCS(Semaforo sem){
+			Task work = createTask(sem);
 			generator = new LoadGenerator("Prueba Cliente-Servidor", numberOfTasks, work, gapsBetweenTasks);
 			generator.generate();		
 		}
@@ -26,8 +27,8 @@ public class GeneratorCS {
 		 * Ayuda para construir un task
 		 * @return Task 
 		 */
-		private Task createTask(){
-			return new ClientServerTaskCS();
+		private Task createTask(Semaforo sem){
+			return new ClientServerTaskCS(sem);
 		}
 		
 		//LOS DOS QUE SIGUEN ERAN ESTATICOS
@@ -55,13 +56,14 @@ public class GeneratorCS {
 		 * @param args
 		 */
 		public static void main(String[] args) {
-
+			 Semaforo sem= new Semaforo(-numberOfTasks+1);
 			System.out.println("Entro al constructor");
 			@SuppressWarnings("unused")
-			GeneratorCS gen = new GeneratorCS ();
+			GeneratorCS gen = new GeneratorCS (sem);
 			System.out.println("Creo el generador");
-			
-			int transaccionesP = numberOfTasks - ClienteCS.numTransacciones;
+			boolean bool=true;
+
+			sem.p();
 			double promedio = 0.0;
 			
 			if(ClienteCS.numTransacciones != 0){
@@ -72,6 +74,8 @@ public class GeneratorCS {
 			
 			double cpu = totalUsoCPU();
 			
+			int transaccionesP = gen.numberOfTasks - ClienteCS.numTransacciones;
+			
 			
 			System.out.println("Transacciones perdidas: " + transaccionesP);
 			System.out.println("Transacciones terminadas: " + ClienteCS.numTransacciones);
@@ -79,6 +83,7 @@ public class GeneratorCS {
 			System.out.println("Tiempo de transaccion promedio: " + promedio + " ms");
 			System.out.println("Total porcentaje de uso de CPU: " + cpu + " %");
 	 	}
+
 
 	}
 
