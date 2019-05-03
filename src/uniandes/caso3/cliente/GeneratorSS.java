@@ -9,7 +9,7 @@ public class GeneratorSS {
 	 */
 	private LoadGenerator generator;
 
-	private int numberOfTasks = 400;
+	private int numberOfTasks = 100;
 	private long gapsBetweenTasks = 500;
 
 	/**
@@ -31,8 +31,8 @@ public class GeneratorSS {
 
 	private static long totalTiempoTransaccion(){
 		long total = 0;
-		for (int i = 0; i < Cliente.nTransacciones; i++) {
-			total += Cliente.tiempoTransaccion;
+		for (int i = 0; i < ClienteSS.numTransacciones; i++) {
+			total += ClienteSS.tiempo.get(i);
 		}		
 
 		return total;
@@ -40,8 +40,8 @@ public class GeneratorSS {
 
 	private static double totalUsoCPU(){
 		double total = 0;
-		for (int i = 0; i < Cliente.nTransacciones; i++) {
-			total += (Cliente.porcentajeUsoCPU/Cliente.cantCPU);
+		for (int i = 0; i < ClienteSS.numTransacciones; i++) {
+			total += (ClienteSS.usoCPU.get(i)/100.0); ////Arreglar;
 		}		
 
 		return total;
@@ -54,26 +54,24 @@ public class GeneratorSS {
 	public static void main(String[] args) {
 
 		@SuppressWarnings("unused")
-		Generator gen = new Generator();
+		GeneratorSS gen = new GeneratorSS();
 
-		int transaccionesP = gen.numberOfTasks - Cliente.nTransacciones;
+		int transaccionesP = gen.numberOfTasks - ClienteSS.numTransacciones;
 		double promedio = 0.0;
 
-		if(Cliente.nTransacciones != 0){
-			promedio = totalTiempoTransaccion()/Cliente.nTransacciones;
+		if(ClienteSS.numTransacciones != 0){
+			promedio = totalTiempoTransaccion()/ClienteSS.numTransacciones;
 		}
 
 		long total = totalTiempoTransaccion();
 
 		double cpu = totalUsoCPU();
 
-		DecimalFormat formato1 = new DecimalFormat("#.###");
-
 		System.out.println("Transacciones perdidas: " + transaccionesP);
-		System.out.println("Transacciones terminadas: " + Cliente.nTransacciones);
+		System.out.println("Transacciones terminadas: " + ClienteSS.numTransacciones);
 		System.out.println("Tiempo total transacciones: " + total + " ms");
-		System.out.println("Tiempo de transaccion promedio: " + formato1.format(promedio) + " ms");
-		System.out.println("Total porcentaje de uso de CPU: " + formato1.format(cpu) + " %");
+		System.out.println("Tiempo de transaccion promedio: " + promedio + " ms");
+		System.out.println("Total porcentaje de uso de CPU: " + cpu + " %");
 	}
 
 }

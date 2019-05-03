@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.security.Key;
@@ -12,30 +13,34 @@ import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.xml.bind.DatatypeConverter;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.jcajce.provider.symmetric.Blowfish;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public class ClienteSS {
 	
 	public static int numTransacciones; 
+	public static ArrayList<Long> tiempo = new ArrayList<Long>();
+	public static ArrayList<Double> usoCPU = new ArrayList<Double>();
 	
 	//Configuracion puertos 
 	public static final int PUERTO= 8080;
 	public static final String SERVIDOR="localhost";
 	
-	//variable donde se guardan los algoritmos que el usuario decide usar 
-		private static String simetrico="";
-		private static String asimetrico="";
-		private static String Hmac="";
 		//Algoritmos simetricos
 		public static final String AES="AES";
 		public static final String BLOWFISH="Blowfish";
@@ -48,6 +53,11 @@ public class ClienteSS {
 		public static final String SHA256= "HMACSHA256";
 		public static final String SHA384= "HMACSHA384";
 		public static final String SHA512= "HMACSHA512";
+		
+		//variable donde se guardan los algoritmos que el usuario decide usar 
+		private static String simetrico=BLOWFISH;
+		private static String asimetrico=RSA;
+		private static String Hmac=SHA1;
 
 		private static KeyPair llaveAsimetrica;
 		private static SecretKey llaveSimetrica;
@@ -57,6 +67,7 @@ public class ClienteSS {
 		
 		public ClienteSS () throws Exception{
 			
+			long tiempoIni= System.currentTimeMillis();
 			Socket socket= new Socket(SERVIDOR,PUERTO);
 			
 			BufferedReader pIn= new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -83,38 +94,7 @@ public class ClienteSS {
 
 				//Si el servidor responde correctamente s escojen los algoritmos 
 				if (fromServer!=null && fromServer.equalsIgnoreCase("OK")){
-					System.out.println("Escoja el algoritmo simetrico");
-					System.out.println("1.AES");
-					System.out.println("2. BLOWFISH");
-					int respuesta=Integer.parseInt(stdIn.readLine());
-					switch (respuesta){
-					case 1:
-						simetrico=AES;
-						break;
-					case 2: 
-						simetrico= BLOWFISH;
-						break;
-					}
-					asimetrico= RSA;
 
-					System.out.println("Escoja el algoritmo hmac");
-					System.out.println("1."+SHA1);
-					System.out.println("2."+SHA256);
-					System.out.println("3."+ SHA384);
-					System.out.println("4."+ SHA512);
-					respuesta=Integer.parseInt(stdIn.readLine());
-					switch (respuesta){
-					case 1:
-						Hmac=SHA1;
-						break;
-					case 2:
-						Hmac=SHA256;
-						break;
-					case 3:
-						Hmac=SHA384;
-					case 4: 
-						Hmac=SHA512;
-					}
 					fromUser= "ALGORITMOS:"+simetrico+":"+RSA+":"+Hmac;
 					pOut.println(fromUser);
 					System.out.println("Mensaje al servidor: "+ fromUser);
@@ -175,7 +155,7 @@ public class ClienteSS {
 				System.out.println("Mensaje del servidor: "+ fromServer);
 				if(fromServer!=null){
 				byte[] llave= DatatypeConverter.parseHexBinary(fromServer);
-				
+				usoCPU.add(getSystemCpuLoad());
 				pOut.println("OK");
 				System.out.println("Mensaje al servidor: OK");
 				}
@@ -188,11 +168,7 @@ public class ClienteSS {
 				//ETAPA 3
 				//****************************************************************
 				//Datos sobre la ubicacion
-				System.out.println("Ingrese los grados");
-				String grados =stdIn.readLine();
-				System.out.println("Ingrese los minutos");
-				String minutos =(stdIn.readLine());
-				String coordenadas=idCliente+";"+grados+","+minutos;
+				String coordenadas="15;4,24";
 				pOut.println(DatatypeConverter.printHexBinary(coordenadas.getBytes()));
 				pOut.println(DatatypeConverter.printHexBinary(coordenadas.getBytes()));
 				System.out.println("Datos enviados al servidor: "+DatatypeConverter.printHexBinary(coordenadas.getBytes()));
@@ -207,11 +183,13 @@ public class ClienteSS {
 				else{
 					System.out.println("Lo logramos!!");
 					continuar=false;
+					long tiempoFin= System.currentTimeMillis();
+					tiempo.add(tiempoFin-tiempoIni);
+					numTransacciones++;
 				}
 				
 			}
 			
-			numTransacciones++;
 
 		}
 		
@@ -262,5 +240,18 @@ public class ClienteSS {
 				throw new Exception("No se pudo generar el certificado: "+ e.getMessage());
 			}
 		}
+		
+		public double getSystemCpuLoad() throws Exception {
+			 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+			 ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+			 AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
+			 if (list.isEmpty()) return Double.NaN;
+			 Attribute att = (Attribute)list.get(0);
+			 Double value = (Double)att.getValue();
+			 // usually takes a couple of seconds before we get real values
+			 if (value == -1.0) return Double.NaN;
+			 // returns a percentage value with 1 decimal point precision
+			 return ((int)(value * 1000) / 10.0);
+			 }
 
 }
