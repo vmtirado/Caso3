@@ -261,7 +261,7 @@ public class ClienteCS {
 			tiempo.add(tiempoFin-tiempoIni);
 			
 			//se suma 1 transaccion 
-			numTransacciones++;s
+			numTransacciones++;
 			
 		}
 
