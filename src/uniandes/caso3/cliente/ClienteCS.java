@@ -38,7 +38,7 @@ public class ClienteCS {
 	
 	//Configuracion puertos 
 	public static final int PUERTO= 8080;
-	public static final String SERVIDOR="localhost";
+	public static final String SERVIDOR="157.253.201.149";
 	
 		//Algoritmos simetricos
 		public static final String AES="AES";
@@ -212,6 +212,12 @@ public class ClienteCS {
 				if(sameHash(DatatypeConverter.printHexBinary(hmac),DatatypeConverter.printHexBinary(decifrado))){
 					System.out.println("LO LOGRAMOS!!");
 					continuar=false;
+					//Tiempo de la transaccion 
+					long tiempoFin= System.currentTimeMillis();
+					tiempo.add(tiempoFin-tiempoIni);
+					
+					//se suma 1 transaccion 
+					numTransacciones++;
 				}
 				else{
 					System.out.println("almost there");
@@ -219,12 +225,6 @@ public class ClienteCS {
 				}
 			}
 			
-			//Tiempo de la transaccion 
-			long tiempoFin= System.currentTimeMillis();
-			tiempo.add(tiempoFin-tiempoIni);
-			
-			//se suma 1 transaccion 
-			numTransacciones++;
 			
 		}
 

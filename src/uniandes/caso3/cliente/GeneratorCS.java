@@ -10,8 +10,8 @@ public class GeneratorCS {
 		 */
 		private LoadGenerator generator;
 		
-		private static int numberOfTasks = 10;
-		private long gapsBetweenTasks = 500;
+		private static int numberOfTasks = 3;
+		private long gapsBetweenTasks = 20;
 
 		/**
 		 * Constructor de un nuevo generador
@@ -43,11 +43,11 @@ public class GeneratorCS {
 		
 		private static  double totalUsoCPU(){
 			double total = 0;
-			for (int i = 0; i < ClienteCS.numTransacciones; i++) {
-				total += (ClienteCS.usoCPU.get(i)/100); //Arreglar!!!
+			for (int i = 0; i < ClienteCS.usoCPU.size(); i++) {
+				total += (ClienteCS.usoCPU.get(i)); //Arreglar!!!
 			}		
 					
-			return total;
+			return total/ClienteCS.usoCPU.size();
 		}
 
 		/**
