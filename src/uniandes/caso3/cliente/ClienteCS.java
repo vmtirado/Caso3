@@ -35,10 +35,11 @@ public class ClienteCS {
 	public static  int numTransacciones; 
 	public static ArrayList<Long> tiempo = new ArrayList<Long>();
 	public static ArrayList<Double> usoCPU = new ArrayList<Double>();
+
 	
 	//Configuracion puertos 
 	public static final int PUERTO= 8080;
-	public static final String SERVIDOR="157.253.201.149";
+	public static final String SERVIDOR="157.253.202.30";
 	
 		//Algoritmos simetricos
 		public static final String AES="AES";
@@ -66,7 +67,7 @@ public class ClienteCS {
 
 
 		public  ClienteCS (Semaforo sem) throws Exception{
-			sem.v();
+//			sem.v();
 			long tiempoIni=System.currentTimeMillis();
 			
 			Socket socket= new Socket(SERVIDOR,PUERTO);
@@ -83,7 +84,7 @@ public class ClienteCS {
 			while(continuar)
 			{
 				
-				
+				double cpuMit=-1;
 				//****************************************************************
 				//ETAPA 1
 				//****************************************************************
@@ -155,8 +156,6 @@ public class ClienteCS {
 					
 					//Se mide el uso de cpu aqui ya que se decifra y cifran llaves 
 					
-					usoCPU.add(getSystemCpuLoad());
-					
 					
 				}
 				else {
@@ -194,7 +193,7 @@ public class ClienteCS {
 				String coordenadas= "15;4,24";
 				System.out.println("coordenadas "+coordenadas);
 				
-				byte[]cifrado=K.cifrar(llaveSimetrica, simetrico, coordenadas);
+				byte[]cifrado=K.cifrar(llaveSimetrica, simetrico, coordenadas.trim());
 				
 				fromUser=DatatypeConverter.printHexBinary(cifrado);
 				pOut.println(fromUser);
@@ -215,12 +214,11 @@ public class ClienteCS {
 					//Tiempo de la transaccion 
 					long tiempoFin= System.currentTimeMillis();
 					tiempo.add(tiempoFin-tiempoIni);
-					
 					//se suma 1 transaccion 
 					numTransacciones++;
 					
 					System.out.println("LO LOGRAMOS!! "+numTransacciones);
-
+					continuar=false;
 				}
 				else{
 					System.out.println("almost there");
@@ -284,17 +282,5 @@ public class ClienteCS {
 			return h1.compareTo(h2)==0;
 		}
 		
-		public double getSystemCpuLoad() throws Exception {
-			 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-			 ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
-			 AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
-			 if (list.isEmpty()) return Double.NaN;
-			 Attribute att = (Attribute)list.get(0);
-			 Double value = (Double)att.getValue();
-			 // usually takes a couple of seconds before we get real values
-			 if (value == -1.0) return Double.NaN;
-			 // returns a percentage value with 1 decimal point precision
-			 return ((int)(value * 1000) / 10.0);
-			 }
 
 }

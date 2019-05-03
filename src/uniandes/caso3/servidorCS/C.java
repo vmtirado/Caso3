@@ -16,13 +16,14 @@ public class C {
 	private static final String MAESTRO = "MAESTRO: ";
 	private static X509Certificate certSer; /* acceso default */
 	private static KeyPair keyPairServidor; /* acceso default */
+
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub
-
+		
 		System.out.println(MAESTRO + "Establezca puerto de conexion:");
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
@@ -49,12 +50,14 @@ public class C {
 		System.out.println("El numero de Threads es "+ nThreads);
 		
 		ExecutorService ex = Executors.newFixedThreadPool(nThreads);
+		 Log lg= new Log();
 //		ex.awaitTermination(timeout, unit)
 		while (true) {
 			try { 
 				Socket sc = ss.accept();
 				System.out.println(MAESTRO + "Cliente " + idThread + " aceptado.");
-				ex.execute(new D(sc,idThread));
+				D d=new D(sc,idThread, lg);
+				ex.execute(d);
 				idThread++;
 			} catch (IOException e) {
 				System.out.println(MAESTRO + "Error creando el socket cliente.");

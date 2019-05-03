@@ -60,6 +60,7 @@ public class S {
 				(algo.equals(DES) || algo.equals(AES)?"/ECB/PKCS5Padding":"");
 		Cipher decifrador = Cipher.getInstance(algo); 
 		decifrador.init(Cipher.DECRYPT_MODE, key); 
+		
 		return decifrador.doFinal(msg);
 	}
 	

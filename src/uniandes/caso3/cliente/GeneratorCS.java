@@ -12,6 +12,7 @@ public class GeneratorCS extends Thread{
 		
 		private static  int numberOfTasks = 200;
 		private long gapsBetweenTasks = 20;
+		
 
 
 		/**
@@ -56,6 +57,7 @@ public class GeneratorCS extends Thread{
 		 * @param args
 		 */
 		public static void main(String[] args) {
+			boolean termino=false;
 			 Semaforo sem= new Semaforo(-numberOfTasks+1);
 			System.out.println("Entro al constructor");
 			@SuppressWarnings("unused")
@@ -63,7 +65,7 @@ public class GeneratorCS extends Thread{
 			System.out.println("Creo el generador");
 			boolean bool=true;
 
-			sem.p();
+//			sem.p();
 			double promedio = 0.0;
 			
 			if(ClienteCS.numTransacciones != 0){
@@ -76,14 +78,12 @@ public class GeneratorCS extends Thread{
 			
 			int transaccionesP = gen.numberOfTasks - ClienteCS.numTransacciones;
 			
-			
 			System.out.println("Transacciones perdidas: " + transaccionesP);
 			System.out.println("Transacciones terminadas: " + ClienteCS.numTransacciones);
 			System.out.println("Tiempo total transacciones: " + total + " ms");
 			System.out.println("Tiempo de transaccion promedio: " + promedio + " ms");
 			System.out.println("Total porcentaje de uso de CPU: " + cpu + " %");
-	 	}
-
+		}
 
 	}
 
