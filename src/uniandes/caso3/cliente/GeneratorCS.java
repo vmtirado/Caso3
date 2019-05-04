@@ -10,7 +10,7 @@ public class GeneratorCS extends Thread{
 		 */
 		private LoadGenerator generator;
 		
-		private static  int numberOfTasks = 200;
+		private static  int numberOfTasks = 400;
 		private long gapsBetweenTasks = 20;
 		
 

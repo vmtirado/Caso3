@@ -39,7 +39,7 @@ public class ClienteCS {
 	
 	//Configuracion puertos 
 	public static final int PUERTO= 8080;
-	public static final String SERVIDOR="157.253.202.30";
+	public static final String SERVIDOR="localhost";
 	
 		//Algoritmos simetricos
 		public static final String AES="AES";
@@ -149,12 +149,10 @@ public class ClienteCS {
 
 					//Genera una llave simetrica la cifra con la publica del servidor 
 					llaveSimetrica= K.simetricKey(simetrico);
-					String textoSimetrica= new String (llaveSimetrica.getEncoded());
+					byte[] textoSimetrica=  llaveSimetrica.getEncoded();
 					byte[] cifrado= K.cifrar(llavePublicaServidor,asimetrico,textoSimetrica);
 					pOut.println(DatatypeConverter.printHexBinary(cifrado));
 					System.out.println("Se le envio la llave simetrica cifrada al servidor: ");
-					
-					//Se mide el uso de cpu aqui ya que se decifra y cifran llaves 
 					
 					
 				}
@@ -193,7 +191,7 @@ public class ClienteCS {
 				String coordenadas= "15;4,24";
 				System.out.println("coordenadas "+coordenadas);
 				
-				byte[]cifrado=K.cifrar(llaveSimetrica, simetrico, coordenadas.trim());
+				byte[]cifrado=K.cifrar(llaveSimetrica, simetrico, coordenadas.getBytes());
 				
 				fromUser=DatatypeConverter.printHexBinary(cifrado);
 				pOut.println(fromUser);

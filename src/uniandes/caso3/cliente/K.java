@@ -50,11 +50,11 @@ public class K {
 	 * @param texto texto a cifrar 
 	 * @return byte[] con el texto cifrado 
 	 */
-	public static byte[] cifrar (Key llave,String algoritmo, String texto ){
+	public static byte[] cifrar (Key llave,String algoritmo, byte[] texto ){
 		byte[] textoCifrado;
 		try {
 			Cipher cifrador= Cipher.getInstance(algoritmo);
-			byte[] textoClaro=texto.getBytes();
+			byte[] textoClaro=texto;
 
 			cifrador.init(Cipher.ENCRYPT_MODE, llave);
 			textoCifrado=cifrador.doFinal(textoClaro);

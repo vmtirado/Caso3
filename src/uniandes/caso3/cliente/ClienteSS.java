@@ -140,7 +140,7 @@ public class ClienteSS {
 
 					//Genera una llave simetrica y la cifra con la publica del servidor 
 					llaveSimetrica= K.simetricKey(simetrico);
-					String textoSimetrica= new String (llaveSimetrica.getEncoded());
+					byte[] textoSimetrica= llaveSimetrica.getEncoded();
 					byte[] cifrado= K.cifrar(llavePublicaServidor,asimetrico,textoSimetrica);
 					pOut.println(DatatypeConverter.printHexBinary(cifrado));
 					System.out.println("Se le envio la llave simetrica cifrada al servidor: ");
