@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
@@ -12,7 +13,13 @@ import java.security.cert.X509Certificate;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.xml.bind.DatatypeConverter;
+
+import uniandes.caso3.servidorCS.Log;
 
 public class D extends Thread {
 	public static final String OK = "OK";
@@ -40,12 +47,14 @@ public class D extends Thread {
 	private Socket sc = null;
 	private String dlg;
 	private byte[] mybyte;
+	private Log log;
 	private static X509Certificate certSer;
 	private static KeyPair keyPairServidor;
 	
-	public D (Socket csP, int idP) {
+	public D (Socket csP, int idP,Log lg) {
 		sc = csP;
 		dlg = new String("delegado sin" + idP + ": ");
+		log=lg;
 		try {
 		mybyte = new byte[520]; 
 		mybyte = certSer.getEncoded( );
@@ -70,14 +79,18 @@ public class D extends Thread {
 	}
 
 	public void run() {
+		double cpuIni=-1;
+		double cpuMit=-1;
+		double cpuFin=-1;
 		String linea;
 	    System.out.println(dlg + "Empezando atencion.");
 	        try {
-
+	        	long tiempoIni=System.currentTimeMillis();
 				PrintWriter ac = new PrintWriter(sc.getOutputStream() , true);
 				BufferedReader dc = new BufferedReader(new InputStreamReader(sc.getInputStream()));
 
 				/***** Fase 1:  *****/
+				cpuIni=getSystemCpuLoad();
 				linea = dc.readLine();
 				if (!linea.equals(HOLA)) {
 					ac.println(ERROR);
@@ -124,6 +137,9 @@ public class D extends Thread {
 				InputStream in = new ByteArrayInputStream(certificadoClienteBytes);
 				X509Certificate certificadoCliente = (X509Certificate)creador.generateCertificate(in);
 				System.out.println(dlg + "recibio certificado del cliente. continuando.");
+				
+				cpuMit=getSystemCpuLoad();
+				
 				//ac.println(OK);
 				
 				/***** Fase 4:  *****/
@@ -164,7 +180,10 @@ public class D extends Thread {
 				}
 
 		        sc.close();
+		        cpuFin= getSystemCpuLoad();
 		        System.out.println(dlg + "Termino exitosamente.");
+		        long tiempoFin=System.currentTimeMillis();
+				log.agregarValores(tiempoFin-tiempoIni, cpuIni,cpuMit, cpuFin);
 				
 	        } catch (Exception e) {
 	        	try {
@@ -181,4 +200,18 @@ public class D extends Thread {
 	public static byte[] toByteArray(String s) {
 	    return DatatypeConverter.parseHexBinary(s);
 	}
+	
+	public double getSystemCpuLoad() throws Exception {
+		 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+		 ObjectName name = ObjectName.getInstance("java.lang:type=OperatingSystem");
+		 AttributeList list = mbs.getAttributes(name, new String[]{ "SystemCpuLoad" });
+		 if (list.isEmpty()) return Double.NaN;
+		 Attribute att = (Attribute)list.get(0);
+		 Double value = (Double)att.getValue();
+		 // usually takes a couple of seconds before we get real values
+		 if (value == -1.0) return Double.NaN;
+		 // returns a percentage value with 1 decimal point precision
+		 return ((int)(value * 1000) / 10.0);
+		 }
+
 }

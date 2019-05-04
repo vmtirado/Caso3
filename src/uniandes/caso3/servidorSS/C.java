@@ -8,6 +8,10 @@ import java.net.Socket;
 import java.security.KeyPair;
 import java.security.Security;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import uniandes.caso3.servidorCS.Log;
 
 public class C {
 	private static ServerSocket ss;	
@@ -38,11 +42,22 @@ public class C {
 		keyPairServidor = S.grsa();
 		certSer = S.gc(keyPairServidor);
 		D.initCertificate(certSer, keyPairServidor);
+		
+		BufferedReader stdIn= new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Escoja el numero de Threads que desea usar");
+		System.out.println("1");
+		System.out.println("2");
+		int nThreads=Integer.parseInt(stdIn.readLine());
+		System.out.println("El numero de Threads es "+ nThreads);
+		
+		ExecutorService ex = Executors.newFixedThreadPool(nThreads);
+		 Log lg= new Log();
+		 
 		while (true) {
 			try { 
 				Socket sc = ss.accept();
 				System.out.println(MAESTRO + "Cliente " + idThread + " aceptado.");
-				D d = new D(sc,idThread);
+				D d = new D(sc,idThread, lg);
 				idThread++;
 				d.start();
 			} catch (IOException e) {
