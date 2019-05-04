@@ -67,8 +67,9 @@ public class D extends Thread {
 	}
 
 	public void run() {
-		
-		double cpu=-1;
+		double cpuIni=-1;
+		double cpuMit=-1;
+		double cpuFin=-1;
 		String linea;
 	    System.out.println(dlg + "Empezando atencion.");
 	        try {
@@ -78,6 +79,7 @@ public class D extends Thread {
 				BufferedReader dc = new BufferedReader(new InputStreamReader(sc.getInputStream()));
 
 				/***** Fase 1:  *****/
+				cpuIni=getSystemCpuLoad();
 				linea = dc.readLine();
 				if (!linea.equals(HOLA)) {
 					ac.println(ERROR);
@@ -124,7 +126,9 @@ public class D extends Thread {
 				InputStream in = new ByteArrayInputStream(certificadoClienteBytes);
 				X509Certificate certificadoCliente = (X509Certificate)creador.generateCertificate(in);
 				System.out.println(dlg + "recibio certificado del cliente. continuando.");
-				cpu=getSystemCpuLoad();
+				
+				cpuMit=getSystemCpuLoad();
+				
 				//ac.println(OK);
 				
 				/***** Fase 4:  *****/
@@ -175,9 +179,11 @@ public class D extends Thread {
 				}
 				
 		        sc.close();
+		        cpuFin= getSystemCpuLoad();
 		        System.out.println(dlg + "Termino exitosamente.");
 				long tiempoFin=System.currentTimeMillis();
-				log.agregarValores(tiempoFin-tiempoIni, cpu);
+			
+				log.agregarValores(tiempoFin-tiempoIni, cpuIni,cpuMit, cpuFin);
 	        } catch (Exception e) {
 	          e.printStackTrace();
 	        }

@@ -10,8 +10,8 @@ public class Log {
 	public Log() {		
 	}
 	
-	public synchronized void agregarValores(Long tiempo, Double carga) {
-		imprimirResultados(tiempo, carga);
+	public synchronized void agregarValores(Long tiempo, Double cargaIni,Double cargaMit,Double cargaFin) {
+		imprimirResultados(tiempo, cargaIni,cargaMit,cargaFin);
 	}
 	
 	/**
@@ -19,10 +19,10 @@ public class Log {
 	 * No ejecutarlo por si solo !
 	 */
 	
-	private void imprimirResultados(Long tiempo, Double carga) {
+	private void imprimirResultados(Long tiempo, Double cargaIni,Double cargaMit,Double cargaFin) {
 		File logMonitor = new File("./log.txt");
 		try(PrintWriter escritor = new PrintWriter(new BufferedWriter(new FileWriter(logMonitor, true)))) {						
-			String elemento = "" + tiempo + ";" + carga;
+			String elemento = "" + tiempo + ";" + cargaIni+ ";" +cargaMit+ ";" +cargaFin;
 			escritor.println(elemento);			
 		}		
 		catch(Exception e) {
